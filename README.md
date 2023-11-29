@@ -1,5 +1,7 @@
 # **CI/CD for Monitoring Python App with GitHub Actions & ArgoCD**
 
+![flow](images/architecture.png)
+
 ## Things you will Learn 🤯
 
 1. Developing a Monitoring Application in Python Using Flask and psutil
