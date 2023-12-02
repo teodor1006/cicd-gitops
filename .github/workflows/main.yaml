@@ -33,10 +33,6 @@ jobs:
 
       - name: SonarCloud Analysis
         uses: sonarsource/sonarcloud-github-action@master
-        with:
-          args: >
-            -Dsonar.organization=teodor1006
-            -Dsonar.projectKey=teodor1006_cicd-gitops-argocd
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    
