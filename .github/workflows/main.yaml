@@ -1,6 +1,7 @@
 name: CI with GitHub Actions
 
-on: workflow_dispatch
+on:
+  workflow_dispatch
 
 jobs:
   Testing:
@@ -29,17 +30,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Setup SonarCloud
         uses: sonarsource/sonarcloud-github-action@master
+        with:
+          sonar-token: ${{ secrets.SONAR_TOKEN }}
+          project-key: ${{ secrets.PROJECT_KEY }}
+          organization: ${{ secrets.ORGANIZATION_KEY }}
         env:
           GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          PROJECT_KEY: ${{ secrets.PROJECT_KEY }}
-          ORGANIZATION: ${{ secrets.ORGANIZATION_KEY }}       
 
   Build_and_Publish:
-    needs: Testing
+    needs: SonarCloud
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -49,18 +51,19 @@ jobs:
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOCKEN }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
-        
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/clockbox:latest  
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/clockbox:latest
+ 
       
 
 
