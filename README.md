@@ -97,7 +97,20 @@ sonar.organization=<your-sonarcloud-organization>
 sonar.projectKey=<your-project-key>
 sonar.sources=.
 ```
-### **Step 2: Create GitHub Token for SonarCloud**
+
+### **Step 2: Set Up a Quality Gate**
+
+* Choose the organization that corresponds to the project for which you want to set up the Quality Gate.
+* In the left sidebar, click on "Quality Gates."
+* Click on the "Create" button to create a new Quality Gate.
+* Define the conditions that your code must meet to pass the Quality Gate. This can include metrics such as code coverage, code duplication, and specific rules violations.
+* After configuring the conditions, save the Quality Gate.
+* Go to Your Project and in the project settings, find the "Quality Gates" section.
+* Choose the Quality Gate you created from the list and associate it with your project.
+* Save the changes to apply the Quality Gate to your project.
+
+
+### **Step 3: Create GitHub Token for SonarCloud**
 
 * Go to your GitHub account.
 * Click on your profile picture in the top-right corner and select "Settings."
