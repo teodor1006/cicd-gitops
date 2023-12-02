@@ -238,7 +238,7 @@ jobs:
 ![image](images/docker-image.png)
 
 
-## **Part 4: Create Deployment and Service file for K8s**
+## **Part 6: Create Deployment and Service file for K8s**
 
 ```
 apiVersion: apps/v1
@@ -282,7 +282,7 @@ spec:
 image: teodor1006/clockbox:latest 
 ```
 
-## **Part 5: Install and Configure ArgoCD**
+## **Part 7: Install and Configure ArgoCD**
 
 ### **Step 1: Install ArgoCD**
 
@@ -393,7 +393,7 @@ minikube ip          # to check on what ip the app is running
 ![flask](images/flaskcheck.png)
 
 
-## **Part 6: Clean up**
+## **Part 8: Clean up**
 
 * Run these commands:
 
