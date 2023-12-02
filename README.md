@@ -4,11 +4,13 @@
 
 ## Things you will Learn 🤯
 
-1. Developing a Monitoring Application in Python Using Flask and psutil
-2. Executing a Python Application Locally
-3. Building a Docker Image and Uploading to DockerHub for Continuous Integration with GitHub Actions Workflow
-4. Crafting Deployment and Service Files for Kubernetes (K8s)
-5. Setting Up and Implementing ArgoCD for Continuous Delivery
+1. Executing a Python Application Locally
+2. Creating a Dockerfile
+3. Setting Up SonarCloud for Code Quality Analysis
+4. Integrating Slack for Notifications with GitHub Actions 
+5. Building a Docker Image and Uploading to DockerHub for Continuous Integration with GitHub Actions Workflow 
+6. Crafting Deployment and Service Files for Kubernetes (K8s)
+7. Setting Up and Implementing ArgoCD for Continuous Delivery
 
 ## **Prerequisites** 
 
@@ -16,6 +18,7 @@
 
 - [x]  Python3 installed.
 - [x]  Dockerhub Account configured.
+- [x]  SonarCloud Account configured. 
 - [x]  Minikube installed.
 - [x]  Code editor of your choice.
 - [x]  GitBash installed.
@@ -34,7 +37,7 @@ git clone <repository_url>
 
 ### **Step 2: Install dependencies**
 
-The application uses the **`psutil`** and **`Flask`, Plotly** libraries. Install them using pip:
+The application uses the **`psutil`**, **`Flask`** and **`Plotly`** libraries. Install them using pip:
 
 ```
 pip3 install -r requirements.txt
@@ -80,7 +83,48 @@ EXPOSE 5000
 CMD ["flask", "run"]
 ```
 
-## **Part 3: Build and Push a DockerImage to your Dockerhub account**
+## **Part 3: Setting Up SonarCloud for Code Quality Analysis**
+
+### **Step 1: Configure SonarCloud**
+
+* First go to [http://sonarcloud.io/](http://sonarcloud.io/) and click on connect with GitHub.
+* After signing in to SonarCloud, create a new organization that will hold your projects.
+* In SonarCloud, go to your Account Settings -> Security and generate a new token. This token will be used to authenticate SonarCloud with your GitHub repository.
+* Go to your GitHub repository. Navigate to "Settings" > "Secrets". Add a new secret with the name **`SONAR_TOKEN`** and paste the token generated in the previous step.
+* Add a sonar-project.properties file to the root of your project. Configure this file with the necessary settings, such as the project key, organization key, and source directory. Example:
+```
+sonar.organization=<your-sonarcloud-organization>
+sonar.projectKey=<your-project-key>
+sonar.sources=.
+```
+### **Step 2: Create GitHub Token for SonarCloud**
+
+* Go to your GitHub account.
+* Click on your profile picture in the top-right corner and select "Settings."
+* In the left sidebar, click on "Developer settings."
+* In the Developer settings, click on "Personal access tokens" under "Access tokens."
+* Click the "Generate token" button.
+* Once generated, copy the token immediately. GitHub will only show it once for security reasons.
+* After that store the token in your GitHub repository with the name **`GIT_TOKEN`**.
+
+
+## **Part 4: Integrating Slack for Notifications**
+
+### **Step 1: Set Up a Slack Workspace and Obtain a Webhook URL**
+
+* Go to the [https://api.slack.com/apps](https://api.slack.com/apps) page and create a new app for your workspace.
+* After creating the app, enable "Incoming Webhooks" in the "Features" section.
+* Scroll down to the "Incoming Webhooks" section and click on "Add New Webhook to Workspace." Choose the channel where you want notifications to be sent.
+* Once added, copy the generated Webhook URL. This URL will be used to send notifications to your Slack channel.
+
+### **Step 2: Add Slack Webhook URL as a Secret in GitHub**
+
+* Go to "Settings" > "Secrets" in your repository.
+* Click on "New repository secret."
+* Name the secret **`SLACK_WEBHOOK_URL`** and paste the Webhook URL you obtained from Slack.
+
+
+## **Part 5: Build and Push a DockerImage to your Dockerhub account**
 
 ### **Step 1: Store your secrets in your GitHub Repo**
 
@@ -88,9 +132,9 @@ You need to go to your DockerHub Account Settings -> Security -> New Access Toke
 
 After that go to your github repo where you stored the project -> Settings -> Secrets and variables -> Actions -> New repository secret.
 
-Secrets to be stored: DOCKERHUB_TOCKEN & DOCKERHUB_USERNAME.
+Secrets to be stored: **`DOCKERHUB_TOCKEN`** & **`DOCKERHUB_USERNAME`**.
 
-### **Step 2: Write the workflow**
+### **Step 2: Write the complete workflow**
 Create a folder in your project directory: .github/workflows and write the following workflow: 
 
 ```
@@ -178,7 +222,11 @@ After that push your updated code to github. The workflow is going to be execute
 
 Go to your github repo and click on Actions. The workflow should have been successfully triggered and executed.
 
-![pipe](images/pipe-success.png)
+![pipe](images/workflow-success.png)
+
+Also you should get a notification from Slack:
+
+![slack-notify](images/slack-notify.png)
 
 After that go to your DockerHub Account -> Repositories and you should see your uploaded DockerImage.
 
