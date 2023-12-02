@@ -29,7 +29,7 @@
 
 ### **Step 1: Clone the code**
 
-Clone the code from the repository:
+* Clone the code from the repository:
 
 ```
 git clone <repository_url>
@@ -37,7 +37,7 @@ git clone <repository_url>
 
 ### **Step 2: Install dependencies**
 
-The application uses the **`psutil`**, **`Flask`** and **`Plotly`** libraries. Install them using pip:
+* The application uses the **`psutil`**, **`Flask`** and **`Plotly`** libraries. Install them using pip:
 
 ```
 pip3 install -r requirements.txt
@@ -45,18 +45,18 @@ pip3 install -r requirements.txt
 
 ### **Step 3: Run the application**
 
-To run the application, navigate to the root directory of the project and execute the following command:
+* To run the application, navigate to the root directory of the project and execute the following command:
 
 ```
 python3 app.py
 ```
 
-This will start the Flask server on **`localhost:5000`**. Navigate to [http://localhost:5000/](http://localhost:5000/) on your browser to access the application.
+* This will start the Flask server on **`localhost:5000`**. Navigate to [http://localhost:5000/](http://localhost:5000/) on your browser to access the application.
 
 
 ## **Part 2: Create a Dockerfile**
 
-Create a **`Dockerfile`** in the root directory of the project with the following contents:
+* Create a **`Dockerfile`** in the root directory of the project with the following contents:
 
 ```
 # Use the official Python image as the base image
@@ -128,20 +128,21 @@ sonar.sources=.
 
 ### **Step 1: Store your secrets in your GitHub Repo**
 
-You need to go to your DockerHub Account Settings -> Security -> New Access Token. A token will be created.
+* You need to go to your DockerHub Account Settings -> Security -> New Access Token. A token will be created.
 
-After that go to your github repo where you stored the project -> Settings -> Secrets and variables -> Actions -> New repository secret.
+* After that go to your github repo where you stored the project -> Settings -> Secrets and variables -> Actions -> New repository secret.
 
-Secrets to be stored: **`DOCKERHUB_TOCKEN`** & **`DOCKERHUB_USERNAME`**.
+* Secrets to be stored: **`DOCKERHUB_TOCKEN`** & **`DOCKERHUB_USERNAME`**.
 
 ### **Step 2: Write the complete workflow**
-Create a folder in your project directory: .github/workflows and write the following workflow: 
+
+* Create a folder in your project directory: .github/workflows and write the following workflow: 
 
 ```
 name: CI with GitHub Actions
 
 on:
-  workflow_dispatch       # optional [push, workflow_dispatch]
+  workflow_dispatch       # [push, workflow_dispatch]
 
 jobs:
   Testing:
@@ -218,21 +219,23 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 ```
-After that push your updated code to github. The workflow is going to be executed.
+* After that push your updated code to github. We are going to trigger the workflow manually (You can change that if you want the workflow to be triggered when there is a change in the code just replace `workflow_dispatch` with the comment `[push, workflow_dispatch]`).
 
-Go to your github repo and click on Actions. The workflow should have been successfully triggered and executed.
+* Go to your github repo and click on Actions. Click on your workflow and on the right side click on **`Run workflow`**. 
 
 ![pipe](images/workflow-success.png)
 
-Also you should get a notification from Slack:
+* Go to your SonarCloud Account and take a look at your project for potential bugs, code smells, etc.
+
+![sonar](images/sonar-check.png)
+
+* Also you should get a notification from Slack:
 
 ![slack-notify](images/slack-notify.png)
 
-After that go to your DockerHub Account -> Repositories and you should see your uploaded DockerImage.
+* After that go to your DockerHub Account -> Repositories and you should see your uploaded DockerImage.
 
 ![image](images/docker-image.png)
-
-Congrats, if you made it so far. You have performed Continuous Integration on your own!
 
 
 ## **Part 4: Create Deployment and Service file for K8s**
@@ -273,7 +276,7 @@ spec:
   type: NodePort   
 ```
 
-You can create as much replicas as you want. Make sure to give your own image name here:
+* You can create as much replicas as you want. Make sure to give your own image name here:
 
 ```
 image: teodor1006/clockbox:latest 
@@ -283,14 +286,14 @@ image: teodor1006/clockbox:latest
 
 ### **Step 1: Install ArgoCD**
 
-Execute the following commands in GitBash:
+* Execute the following commands in GitBash:
 
 ```
 minikube start
 kubectl create ns argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.5.8/manifests/install.yaml
 ```
-After applying ArgoCD manifest file from ArgoCD GitHub Repo you can type:
+* After applying ArgoCD manifest file from ArgoCD GitHub Repo you can type:
 
 ```
 kubectl get pods -n argocd
@@ -298,11 +301,11 @@ kubectl get pods -n argocd
 
 ![pods](images/pods.png)
 
-Wait until your pods are up and running.
+* Wait until your pods are up and running.
 
 ### **Step 2: Configure ArgoCD**
 
-In order to access the web GUI of ArgoCD, we need to do a port forwarding. For that we will use the argocd-server service (But make sure that pods are in a running state before running this command).
+* In order to access the web GUI of ArgoCD, we need to do a port forwarding. For that we will use the argocd-server service (But make sure that pods are in a running state before running this command).
 
 ```
 kubectl port-forward svc/argocd-server -n argocd 8080:443
@@ -310,22 +313,22 @@ kubectl port-forward svc/argocd-server -n argocd 8080:443
 
 ![portf](images/portforward.png)
 
-Now we can go to a browser and open localhost:8080 . 
+* Now we can go to a browser and open localhost:8080 . 
 
-You will see a privacy warning. Just ignore the warning, click on Advanced and then hit on Proceed to localhost (unsafe) to continue to the GUI interface. (Your browser setting may present a different option to continue).
+* You will see a privacy warning. Just ignore the warning, click on Advanced and then hit on Proceed to localhost (unsafe) to continue to the GUI interface. (Your browser setting may present a different option to continue).
 
 ![connection](images/connection.png)
 
-To use ArgoCD interface, we need to enter our credentials. The default username is "admin" so we can enter it immediately, but we will need to get the initial password from ArgoCD through minikube terminal.
+* To use ArgoCD interface, we need to enter our credentials. The default username is "admin" so we can enter it immediately, but we will need to get the initial password from ArgoCD through minikube terminal.
 
-Initial password is kept as a secret in the argocd namespace; Therefore, we will use jsonpath query to retrieve the secret from the argocd namespace. We also need to decode it with base64. To do the both operations, just open a new terminal and enter the following code to do the trick for you. (Do not close the first terminal window as the port-forwarding is still alive)
+* Initial password is kept as a secret in the argocd namespace; Therefore, we will use jsonpath query to retrieve the secret from the argocd namespace. We also need to decode it with base64. To do the both operations, just open a new terminal and enter the following code to do the trick for you. (Do not close the first terminal window as the port-forwarding is still alive)
 
 ```
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 ```
 ![login](images/login.png)
 
-Copy the password, go back to your browser and enter it as password (username is admin). You should be in the GUI interface.
+* Copy the password, go back to your browser and enter it as password (username is admin). You should be in the GUI interface.
 
 ![menu](images/menu.png)
 
@@ -359,42 +362,40 @@ spec:
       prune: true
 ```
 
-Push this file to your github repo. Make sure to replace the repoURL!!!
+* Push this file to your github repo. Make sure to replace the repoURL!!!
 
 ### **Step 4: Deploy the Python App**
 
-Go to Gitbash and deploy the app:
+* Go to Gitbash and deploy the app:
 
 ```
 kubectl apply -f application.yaml
 ```
 
-You should then see the app in ArgoCD!
+* You should then see the app in ArgoCD!
 
 ![myapp](images/myapp.png)
 
-After that you can check the status of the App. It should be in healthy state.
+* After that you can check the status of the App. It should be in healthy state.
 
 ![status](images/statuscheck.png)
 
 ### **Step 5: Access the website**
 
-Open Gitbash and write the following:
+* Open Gitbash and write the following:
 
 ```
 kubectl get svc      # to see the port on which the app is exposed
 minikube ip          # to check on what ip the app is running
 ```
-After that go to your browser and type your ip and port to access the monitoring app.
+* After that go to your browser and type your ip and port to access the monitoring app.
 
 ![flask](images/flaskcheck.png)
-
-Congrats!!! You did amazing job by managing a CI/CD process!!!!
 
 
 ## **Part 6: Clean up**
 
-Run these commands:
+* Run these commands:
 
 ```
 kubectl delete -n argocd
