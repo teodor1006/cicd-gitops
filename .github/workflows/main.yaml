@@ -23,6 +23,19 @@ jobs:
       - name: Run tests
         run: python -m unittest unittests.py
 
+  SonarCloud:
+    needs: Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup SonarCloud
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}       
+
   Build_and_Publish:
     needs: Testing
     runs-on: ubuntu-latest
