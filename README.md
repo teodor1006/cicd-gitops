@@ -97,14 +97,11 @@ Create a folder in your project directory: .github/workflows and write the follo
 name: CI with GitHub Actions
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch       # optional [push, workflow_dispatch]
 
 jobs:
   Testing:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -122,8 +119,24 @@ jobs:
       - name: Run tests
         run: python -m unittest unittests.py
 
-  Build_and_Publish:
+
+
+  SonarCloud:
     needs: Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: SonarCloud Analysis
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+
+  Build_and_Publish:
+    needs: SonarCloud
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -137,7 +150,7 @@ jobs:
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
-        
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -145,6 +158,21 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/clockbox:latest
+
+
+  SlackNotification:
+    needs: Build_and_Publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send a Slack Notification
+        if: always()
+        uses: act10ns/slack@v2
+        with:
+          status: ${{ job.status }}
+          steps: ${{ toJson(steps) }}
+          channel: '#git'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 ```
 After that push your updated code to github. The workflow is going to be executed.
 
