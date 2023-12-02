@@ -34,7 +34,9 @@ jobs:
         uses: sonarsource/sonarcloud-github-action@master
         env:
           GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}       
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          PROJECT_KEY: ${{ secrets.PROJECT_KEY }}
+          ORGANIZATION: ${{ secrets.ORGANIZATION_KEY }}       
 
   Build_and_Publish:
     needs: Testing
