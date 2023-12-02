@@ -33,12 +33,22 @@ jobs:
 
       - name: Setup SonarCloud
         uses: sonarsource/sonarcloud-github-action@master
-        with:
-          project-key: ${{ secrets.PROJECT_KEY }}
-          organization: ${{ secrets.ORGANIZATION_KEY }}
         env:
           GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Analyze with SonarCloud
+        uses: sonarsource/sonarcloud-github-action@master
+        with:
+          projectBaseDir: cicd-gitops-argocd
+          args: >
+            -Dsonar.organization=teodor1006
+            -Dsonar.projectKey=teodor1006_cicd-gitops-argocd
+            -Dsonar.python.coverage.reportPaths=coverage.xml
+            -Dsonar.sources=lib/
+            -Dsonar.test.exclusions=tests/**
+            -Dsonar.tests=tests/
+            -Dsonar.verbose=true    
 
   Build_and_Publish:
     needs: SonarCloud
